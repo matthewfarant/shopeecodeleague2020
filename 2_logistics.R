@@ -26,7 +26,7 @@ order<-add_column(order,X2day=weekdays(order$X2nd_deliver_attempt),.after='X2nd_
 #buyer
 buyerloc<-c()
 for(i in 1:nrow(order)){
-  if(grepl("metro manila",order$buyeraddress[i],ignore.case=TRUE)){
+  if(grepl("metro manila",order$buyeraddress[i],ignore.case=TRUE)|grepl("metromanila",order$buyeraddress[i],ignore.case=TRUE)){
     buyerloc[i]<-'MM'
   }else if(grepl("luzon",order$buyeraddress[i],ignore.case=TRUE)){
     buyerloc[i]<-'LZ'
@@ -68,8 +68,8 @@ for(i in 1:nrow(order)){
 order$SLA<-SLA
 
 #delivery time for first and second attempt
-order$firstattempt<-bizdays(order$pick,order$X1st_deliver_attempt)
-order$secondattempt<-bizdays(order$X1st_deliver_attempt,order$X2nd_deliver_attempt)
+order$firstattempt<-bizdays(order$pick,order$X1st_deliver_attempt)-1
+order$secondattempt<-bizdays(order$X1st_deliver_attempt,order$X2nd_deliver_attempt)-1
 
 #holidays
 passholiday<-c()
@@ -86,6 +86,7 @@ for(i in 1:nrow(order)){
 }
 
 #is_late or not?
+replace_na(order$secondattempt,0)
 is_late<-c()
 for(i in 1:nrow(order)){
   if(order$secondattempt[i]>3){
